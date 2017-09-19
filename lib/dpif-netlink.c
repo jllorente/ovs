@@ -766,6 +766,9 @@ get_vport_type(const struct dpif_netlink_vport *vport)
     case OVS_VPORT_TYPE_LISP:
         return "lisp";
 
+    case OVS_VPORT_TYPE_GTP:
+        return "gtp";
+
     case OVS_VPORT_TYPE_STT:
         return "stt";
 
@@ -798,6 +801,8 @@ netdev_to_ovs_vport_type(const struct netdev *netdev)
         return OVS_VPORT_TYPE_VXLAN;
     } else if (!strcmp(type, "lisp")) {
         return OVS_VPORT_TYPE_LISP;
+    } else if (!strcmp(type, "gtp")) {
+        return OVS_VPORT_TYPE_GTP;
     } else {
         return OVS_VPORT_TYPE_UNSPEC;
     }

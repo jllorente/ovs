@@ -9,6 +9,7 @@ both_modules = \
 	vport_geneve \
 	vport_gre \
 	vport_lisp \
+	vport_gtp \
 	vport_stt \
 	vport_vxlan
 # When changing the name of 'build_modules', please also update the
@@ -32,6 +33,7 @@ vport_geneve_sources = vport-geneve.c
 vport_vxlan_sources = vport-vxlan.c
 vport_gre_sources = vport-gre.c
 vport_lisp_sources = vport-lisp.c
+vport_gtp_sources = vport-gtp.c
 vport_stt_sources = vport-stt.c
 
 openvswitch_headers = \

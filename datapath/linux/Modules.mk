@@ -14,6 +14,7 @@ openvswitch_sources += \
 	linux/compat/ip_tunnels_core.c \
 	linux/compat/ip6_output.c \
 	linux/compat/lisp.c \
+	linux/compat/gtp.c \
 	linux/compat/netdevice.c \
 	linux/compat/net_namespace.c \
 	linux/compat/nf_conntrack_core.c \
@@ -51,6 +52,7 @@ openvswitch_headers += \
 	linux/compat/include/linux/kconfig.h \
 	linux/compat/include/linux/kernel.h \
 	linux/compat/include/net/lisp.h \
+	linux/compat/include/net/gtp.h \
 	linux/compat/include/linux/list.h \
 	linux/compat/include/linux/mpls.h \
 	linux/compat/include/linux/net.h \

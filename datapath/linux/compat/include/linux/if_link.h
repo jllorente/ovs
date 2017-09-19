@@ -46,6 +46,13 @@ enum {
 };
 #define IFLA_LISP_MAX	(__IFLA_LISP_MAX - 1)
 
+/* GTP section */
+enum {
+	IFLA_GTP_PORT,	/* destination port */
+	__IFLA_GTP_MAX
+};
+#define IFLA_GTP_MAX	(__IFLA_GTP_MAX - 1)
+
 /* VXLAN section */
 enum {
 #define IFLA_VXLAN_UNSPEC rpl_IFLA_VXLAN_UNSPEC

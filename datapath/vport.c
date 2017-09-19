@@ -31,6 +31,7 @@
 #include <linux/if_link.h>
 #include <net/net_namespace.h>
 #include <net/lisp.h>
+#include <net/gtp.h>
 #include <net/gre.h>
 #include <net/geneve.h>
 #include <net/vxlan.h>
@@ -64,6 +65,9 @@ int ovs_vport_init(void)
 	err = lisp_init_module();
 	if (err)
 		goto err_lisp;
+	err = gtp_init_module();
+	if (err)
+		goto err_gtp;
 	err = ipgre_init();
 	if (err)
 		goto err_gre;
@@ -86,6 +90,8 @@ err_vxlan:
 err_geneve:
 	ipgre_fini();
 err_gre:
+	gtp_cleanup_module();
+err_gtp:
 	lisp_cleanup_module();
 err_lisp:
 	kfree(dev_table);
@@ -103,6 +109,7 @@ void ovs_vport_exit(void)
 	vxlan_cleanup_module();
 	geneve_cleanup_module();
 	ipgre_fini();
+	gtp_cleanup_module();
 	lisp_cleanup_module();
 	kfree(dev_table);
 }
