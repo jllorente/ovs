@@ -130,7 +130,6 @@ struct netdev_tunnel_config {
     bool tos_inherit;
 
     bool csum;
-    bool ipsec;
     bool dont_fragment;
 };
 

@@ -79,7 +79,6 @@ TESTSUITE_AT = \
 	tests/ovsdb-monitor.at \
 	tests/ovsdb-idl.at \
 	tests/ovs-vsctl.at \
-	tests/ovs-monitor-ipsec.at \
 	tests/ovs-xapi-sync.at \
 	tests/stp.at \
 	tests/rstp.at \
