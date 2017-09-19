@@ -218,10 +218,20 @@ struct vxlan_dev {
 struct net_device *rpl_vxlan_dev_create(struct net *net, const char *name,
 				    u8 name_assign_type, struct vxlan_config *conf);
 
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(4,4,0)
+static inline __be16 vxlan_dev_dst_port(struct vxlan_dev *vxlan,
+					unsigned short family)
+{
+	if (family == AF_INET6)
+		return inet_sk(vxlan->vn6_sock->sock->sk)->inet_sport;
+	return inet_sk(vxlan->vn4_sock->sock->sk)->inet_sport;
+}
+#else
 static inline __be16 vxlan_dev_dst_port(struct vxlan_dev *vxlan)
 {
 	return inet_sport(vxlan->vn_sock->sock->sk);
 }
+#endif
 
 static inline netdev_features_t vxlan_features_check(struct sk_buff *skb,
 						     netdev_features_t features)

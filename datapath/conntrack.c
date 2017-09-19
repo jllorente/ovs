@@ -323,7 +323,7 @@ static int handle_fragments(struct net *net, struct sw_flow_key *key,
 		int err;
 
 		memset(IPCB(skb), 0, sizeof(struct inet_skb_parm));
-		err = ip_defrag(skb, user);
+		err = ip_defrag(NET_ARG(net) skb, user);
 		if (err)
 			return err;
 
@@ -374,7 +374,7 @@ ovs_ct_expect_find(struct net *net, const struct nf_conntrack_zone *zone,
 {
 	struct nf_conntrack_tuple tuple;
 
-	if (!nf_ct_get_tuplepr(skb, skb_network_offset(skb), proto, &tuple))
+	if (!nf_ct_get_tuplepr(skb, skb_network_offset(skb), proto, NET_ARG(net) &tuple))
 		return NULL;
 	return __nf_ct_expect_find(net, zone, &tuple);
 }

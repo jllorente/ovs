@@ -706,7 +706,8 @@ static void ovs_fragment(struct vport *vport, struct sk_buff *skb, u16 mru,
 		skb_dst_set_noref(skb, &ovs_dst);
 		IPCB(skb)->frag_max_size = mru;
 
-		ip_do_fragment(skb->sk, skb, ovs_vport_output);
+		ip_do_fragment(NET_ARG(dev_net(ovs_dst.dev))
+			skb->sk, skb, ovs_vport_output);
 		refdst_drop(orig_dst);
 	} else if (ethertype == htons(ETH_P_IPV6)) {
 		const struct nf_ipv6_ops *v6ops = nf_get_ipv6_ops();
@@ -727,7 +728,8 @@ static void ovs_fragment(struct vport *vport, struct sk_buff *skb, u16 mru,
 		skb_dst_set_noref(skb, &ovs_rt.dst);
 		IP6CB(skb)->frag_max_size = mru;
 
-		v6ops->fragment(skb->sk, skb, ovs_vport_output);
+		v6ops->fragment(NET_ARG(dev_net(ovs_rt.dst.dev))
+			skb->sk, skb, ovs_vport_output);
 		refdst_drop(orig_dst);
 	} else {
 		WARN_ONCE(1, "Failed fragment ->%s: eth=%04x, MRU=%d, MTU=%d.",

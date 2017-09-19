@@ -66,8 +66,20 @@ static inline unsigned int rpl_ip_skb_dst_mtu(const struct sk_buff *skb)
 #define ip_skb_dst_mtu rpl_ip_skb_dst_mtu
 #endif /* HAVE_IP_SKB_DST_MTU */
 
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(4,4,0)
+#define NET_PARAM(x) struct net *x,
+#define NET_ARG(x) x,
+#define NET_DEV_NET(x) dev_net(x)
+#define NET_DECLARE_INIT(x,y)
+#else
+#define NET_PARAM(x)
+#define NET_ARG(x)
+#define NET_DEV_NET(x)
+#define NET_DECLARE_INIT(x,y) struct net *x = y;
+#endif
+
 #ifdef HAVE_IP_FRAGMENT_TAKES_SOCK
-#define OVS_VPORT_OUTPUT_PARAMS struct sock *sock, struct sk_buff *skb
+#define OVS_VPORT_OUTPUT_PARAMS NET_PARAM(net) struct sock *sock, struct sk_buff *skb
 #else
 #define OVS_VPORT_OUTPUT_PARAMS struct sk_buff *skb
 #endif
@@ -89,12 +101,13 @@ static inline bool ip_defrag_user_in_between(u32 user,
 #endif /* < v4.2 */
 
 #ifndef HAVE_IP_DO_FRAGMENT
-static inline int rpl_ip_do_fragment(struct sock *sk, struct sk_buff *skb,
+static inline int rpl_ip_do_fragment(NET_PARAM(net) struct sock *sk, struct sk_buff *skb,
 				     int (*output)(OVS_VPORT_OUTPUT_PARAMS))
 {
 	unsigned int mtu = ip_skb_dst_mtu(skb);
 	struct iphdr *iph = ip_hdr(skb);
 	struct rtable *rt = skb_rtable(skb);
+	NET_DECLARE_INIT(net, dev_net(dev));
 	struct net_device *dev = rt->dst.dev;
 
 	if (unlikely(((iph->frag_off & htons(IP_DF)) && !skb->ignore_df) ||
@@ -102,7 +115,7 @@ static inline int rpl_ip_do_fragment(struct sock *sk, struct sk_buff *skb,
 		      IPCB(skb)->frag_max_size > mtu))) {
 
 		pr_warn("Dropping packet in ip_do_fragment()\n");
-		IP_INC_STATS(dev_net(dev), IPSTATS_MIB_FRAGFAILS);
+		IP_INC_STATS(net, IPSTATS_MIB_FRAGFAILS);
 		kfree_skb(skb);
 		return -EMSGSIZE;
 	}
@@ -116,8 +129,7 @@ static inline int rpl_ip_do_fragment(struct sock *sk, struct sk_buff *skb,
 #define ip_do_fragment rpl_ip_do_fragment
 #endif /* IP_DO_FRAGMENT */
 
-int rpl_ip_defrag(struct sk_buff *skb, u32 user);
-#define ip_defrag rpl_ip_defrag
+int rpl_ip_defrag(NET_PARAM(net) struct sk_buff *skb, u32 user);
 
 int __init rpl_ipfrag_init(void);
 void rpl_ipfrag_fini(void);
@@ -127,13 +139,14 @@ void rpl_ipfrag_fini(void);
  * ("inet: frag: Always orphan skbs inside ip_defrag()"), but it should be
  * always included in kernels 4.5+. */
 #if LINUX_VERSION_CODE < KERNEL_VERSION(4,5,0)
-static inline int rpl_ip_defrag(struct sk_buff *skb, u32 user)
+static inline int rpl_ip_defrag(NET_PARAM(net) struct sk_buff *skb, u32 user)
 {
 	skb_orphan(skb);
-	return ip_defrag(skb, user);
+	return ip_defrag(NET_ARG(net) skb, user);
 }
-#define ip_defrag rpl_ip_defrag
 #endif
+
+#define ip_defrag rpl_ip_defrag
 
 static inline int rpl_ipfrag_init(void) { return 0; }
 static inline void rpl_ipfrag_fini(void) { }

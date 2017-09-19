@@ -13,7 +13,7 @@
  * the callback parameter needs to be in the form that older kernels accept.
  * We don't backport the other ipv6_ops as they're currently unused by OVS. */
 struct ovs_nf_ipv6_ops {
-	int (*fragment)(struct sock *sk, struct sk_buff *skb,
+	int (*fragment)(NET_ARG(net) struct sock *sk, struct sk_buff *skb,
 			int (*output)(OVS_VPORT_OUTPUT_PARAMS));
 };
 #define nf_ipv6_ops ovs_nf_ipv6_ops

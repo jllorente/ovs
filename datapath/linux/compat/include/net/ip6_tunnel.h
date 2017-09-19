@@ -17,11 +17,15 @@ static inline void ip6tunnel_xmit(struct sock *sk, struct sk_buff *skb,
 
 	pkt_len = skb->len - skb_inner_network_offset(skb);
 	/* TODO: Fix GSO for ipv6 */
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(4,4,0)
+	err = ip6_local_out(dev_net(dev), sk, skb);
+#else
 #ifdef HAVE_IP6_LOCAL_OUT_SK
 	err = ip6_local_out_sk(sk, skb);
 #else
 	err = ip6_local_out(skb);
 #endif
+#endif /* >= kernel 4.4 */
 	if (net_xmit_eval(err) != 0)
 		pkt_len = net_xmit_eval(err);
 	else

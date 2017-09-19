@@ -1449,7 +1449,11 @@ static void clean_percpu(struct work_struct *work)
 }
 
 #ifdef HAVE_NF_HOOKFN_ARG_OPS
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(4,4,0)
+#define FIRST_PARAM void *priv
+#else
 #define FIRST_PARAM const struct nf_hook_ops *ops
+#endif /* >= kernel 4.4 */
 #else
 #define FIRST_PARAM unsigned int hooknum
 #endif
@@ -1497,7 +1501,9 @@ static unsigned int nf_ip_hook(FIRST_PARAM, struct sk_buff *skb, LAST_PARAM)
 
 static struct nf_hook_ops nf_hook_ops __read_mostly = {
 	.hook           = nf_ip_hook,
+#if LINUX_VERSION_CODE < KERNEL_VERSION(4,4,0)
 	.owner          = THIS_MODULE,
+#endif
 	.pf             = NFPROTO_IPV4,
 	.hooknum        = NF_INET_LOCAL_IN,
 	.priority       = INT_MAX,
